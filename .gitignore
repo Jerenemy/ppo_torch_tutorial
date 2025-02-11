@@ -1,10 +1,14 @@
 *
 # except
 !.gitignore
+!requirements.txt
 !README.md
 !main.py
+!trainer.py
 !ppo_torch.py
 !utils.py
+!configs/
+!configs/*
 !tmp/
 !tmp/plots/
 !tmp/plots/*

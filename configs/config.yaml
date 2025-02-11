@@ -1,0 +1,26 @@
+training: 
+  N: 20
+  batch_size: 5
+  n_epochs: 3
+  policy_clip: 0.3
+  n_games: 300
+  gamma: 0.99
+  alpha: 0.0003
+  gae_lambda: 0.95
+  env: 'CartPole-v1'
+
+actor_network:
+  fc1_dims: 256
+  fc2_dims: 256
+  file_name: 'actor_torch_ppo'
+
+critic_network:
+  fc1_dims: 256
+  fc2_dims: 256
+  file_name: 'critic_torch_ppo'
+
+paths:
+  figure_file: 'tmp/plots/cartpole.png'
+  chkpt_dir: 'tmp/ppo'
+  entropy_loss_factor:  0.01
+  critic_loss_factor: 0.5

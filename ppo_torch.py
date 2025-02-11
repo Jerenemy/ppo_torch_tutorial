@@ -51,10 +51,10 @@ class PPOMemory:
 
 class ActorNetwork(nn.Module):
     def __init__(self, n_actions, input_dims, alpha,
-            fc1_dims=256, fc2_dims=256, chkpt_dir='tmp/ppo'):
+            fc1_dims=256, fc2_dims=256, chkpt_dir='tmp/ppo', file_name='actor_torch_ppo'):
         super(ActorNetwork, self).__init__()
 
-        self.checkpoint_file = os.path.join(chkpt_dir, 'actor_torch_ppo')
+        self.checkpoint_file = os.path.join(chkpt_dir, file_name)
         self.actor = nn.Sequential(
                 nn.Linear(*input_dims, fc1_dims),
                 nn.ReLU(),
@@ -82,10 +82,10 @@ class ActorNetwork(nn.Module):
 
 class CriticNetwork(nn.Module):
     def __init__(self, input_dims, alpha, fc1_dims=256, fc2_dims=256,
-            chkpt_dir='tmp/ppo'):
+            chkpt_dir='tmp/ppo', file_name='actor_torch_ppo'):
         super(CriticNetwork, self).__init__()
 
-        self.checkpoint_file = os.path.join(chkpt_dir, 'critic_torch_ppo')
+        self.checkpoint_file = os.path.join(chkpt_dir, file_name)
         self.critic = nn.Sequential(
                 nn.Linear(*input_dims, fc1_dims),
                 nn.ReLU(),
@@ -111,11 +111,13 @@ class CriticNetwork(nn.Module):
 
 class Agent:
     def __init__(self, n_actions, input_dims, gamma=0.99, alpha=0.0003, gae_lambda=0.95,
-            policy_clip=0.2, batch_size=64, n_epochs=10):
+            policy_clip=0.2, batch_size=64, n_epochs=10, entropy_loss_factor=0.01, critic_loss_factor=0.5):
         self.gamma = gamma
         self.policy_clip = policy_clip
         self.n_epochs = n_epochs
         self.gae_lambda = gae_lambda
+        self.entropy_loss_factor = entropy_loss_factor
+        self.critic_loss_factor = critic_loss_factor
 
         self.actor = ActorNetwork(n_actions, input_dims, alpha)
         self.critic = CriticNetwork(input_dims, alpha)
@@ -194,7 +196,7 @@ class Agent:
                 
                 # add entropy loss
                 entropy_loss = dist.entropy().mean()  # Encourages exploration
-                total_loss = actor_loss + 0.5 * critic_loss - 0.01 * entropy_loss
+                total_loss = actor_loss + self.critic_loss_factor * critic_loss - self.entropy_loss_factor * entropy_loss
                 total_loss = actor_loss + 0.5*critic_loss
                 self.actor.optimizer.zero_grad()
                 self.critic.optimizer.zero_grad()
@@ -208,3 +210,5 @@ class Agent:
         self.memory.clear_memory()               
 
 
+if __name__ == '__main__':
+    pass
